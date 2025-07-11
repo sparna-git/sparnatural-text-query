@@ -1,4 +1,6 @@
 {
   "send": "Envoyer",
-  "Exemple": "Ex : Donne-moi toutes les œuvres exposées en France"
+  "Exemple": "Ex : Donne-moi toutes les œuvres exposées en France",
+  "warning-1": "⚠️ Attention, les valeurs suivantes n'ont pas été trouvées : ",
+  "warning-2": ". Vous devriez revoir votre requête et rechercher ou sélectionner manuellement les valeurs correctes."
 }

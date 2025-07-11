@@ -2,6 +2,7 @@ import { HTMLComponent, ISparnaturalSpecification } from "sparnatural";
 import { getSettings } from "../settings/defaultSettings";
 import { getSettingsServices } from "../../services/components/settings/defaultSettings";
 import { SparnaturalText2QueryElement } from "../../SparnaturalText2QureyElement";
+import { SparnaturalTextQueryI18n } from "../settings/SparnaturalTextQueryI18n";
 
 class AreaTextQuery extends HTMLComponent {
   specProvider: ISparnaturalSpecification;
@@ -66,6 +67,13 @@ class AreaTextQuery extends HTMLComponent {
     container.appendChild(textareaWrapper);
     container.appendChild(btnContainer);
 
+    // Create message container for warnings/errors
+    const messageContainer = document.createElement("div");
+    messageContainer.id = "messageContainer";
+    messageContainer.className = "message-container";
+    messageContainer.style.cssText = "margin-top: 10px; display: none;";
+    container.appendChild(messageContainer);
+
     this.html.append(container);
 
     return this;
@@ -78,7 +86,7 @@ class AreaTextQuery extends HTMLComponent {
     const sendButton = document.getElementById("btnSend") as HTMLButtonElement;
 
     if (!prompt) {
-      alert("❌ Veuillez entrer une requête naturelle.");
+      this.showErrorMessage("❌ Veuillez entrer une requête naturelle.");
       return;
     }
 
@@ -96,11 +104,28 @@ class AreaTextQuery extends HTMLComponent {
       if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
       const json = await res.json();
 
-      const sparnaturalEl = document.querySelector("spar-natural") as any;
+      // Check for URI_NOT_FOUND values
+      const notFoundValues = this.detectNotFoundValues(json);
+      if (notFoundValues.length > 0) {
+        const valuesList = notFoundValues
+          .map((v: string) => `"${v}"`)
+          .join(", ");
+        this.showWarningMessage(
+          `${SparnaturalTextQueryI18n.labels["warning-1"]} ${valuesList}${SparnaturalTextQueryI18n.labels["warning-2"]}`,
+          (window as any).$,
+          { valuesList },
+          null
+        );
+      } else {
+        this.hideMessage();
+      }
+
       this.loadQuery(json);
     } catch (err: any) {
       console.error("Erreur lors de l'envoi de la requête :", err);
-      alert("❌ Erreur lors de l'envoi de la requête : " + err.message);
+      this.showErrorMessage(
+        "❌ Erreur lors de l'envoi de la requête : " + err.message
+      );
     } finally {
       sendButton.innerHTML = originalText || "Envoyer";
       sendButton.disabled = false;
@@ -120,7 +145,7 @@ class AreaTextQuery extends HTMLComponent {
     if (
       !("webkitSpeechRecognition" in window || "SpeechRecognition" in window)
     ) {
-      alert(
+      this.showErrorMessage(
         "La reconnaissance vocale n'est pas prise en charge par ce navigateur. Veuillez essayer avec Chrome, Opera ou Edge."
       );
       return;
@@ -162,14 +187,16 @@ class AreaTextQuery extends HTMLComponent {
       try {
         await this.sendNaturalRequest();
       } catch (e: any) {
-        alert("Erreur lors de l'envoi de la requête : " + e.message);
+        this.showErrorMessage(
+          "Erreur lors de l'envoi de la requête : " + e.message
+        );
       } finally {
         this.resetVoiceButtonUI();
       }
     };
 
     this.recognition.onerror = (event: any) => {
-      alert("Erreur de reconnaissance vocale : " + event.error);
+      this.showErrorMessage("Erreur de reconnaissance vocale : " + event.error);
       this.resetVoiceButtonUI();
     };
 
@@ -193,6 +220,93 @@ class AreaTextQuery extends HTMLComponent {
     ) as SparnaturalText2QueryElement;
     if (sparnaturalText2Query) {
       sparnaturalText2Query.triggerLoadQueryEvent(query);
+    }
+  }
+
+  private detectNotFoundValues(queryJson: any): string[] {
+    const notFoundValues: string[] = [];
+    const URI_NOT_FOUND =
+      "https://services.sparnatural.eu/api/v1/URI_NOT_FOUND";
+
+    // Recursive function to traverse the JSON object
+    const traverse = (obj: any) => {
+      if (typeof obj === "object" && obj !== null) {
+        // Check if this object has a values array (like in the branches structure)
+        if (Array.isArray(obj.values)) {
+          obj.values.forEach((valueObj: any) => {
+            if (
+              valueObj.rdfTerm &&
+              valueObj.rdfTerm.type === "uri" &&
+              valueObj.rdfTerm.value === URI_NOT_FOUND &&
+              valueObj.label
+            ) {
+              if (!notFoundValues.includes(valueObj.label)) {
+                notFoundValues.push(valueObj.label);
+              }
+            }
+          });
+        }
+
+        // Continue traversing all properties
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            const value = obj[key];
+
+            // Recursively traverse nested objects and arrays
+            if (typeof value === "object") {
+              traverse(value);
+            }
+          }
+        }
+      }
+    };
+
+    traverse(queryJson);
+    return notFoundValues;
+  }
+
+  private showWarningMessage(
+    message: string,
+    $: JQueryStatic,
+    p0: { valuesList: string },
+    p1: any
+  ): void {
+    const messageContainer = document.getElementById("messageContainer");
+    if (messageContainer) {
+      messageContainer.innerHTML = `<div class="warning-message" style="
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 4px;
+        padding: 10px;
+        color: #856404;
+        font-size: 14px;
+        line-height: 1.4;
+      ">${message}</div>`;
+      messageContainer.style.display = "block";
+    }
+  }
+
+  private showErrorMessage(message: string): void {
+    const messageContainer = document.getElementById("messageContainer");
+    if (messageContainer) {
+      messageContainer.innerHTML = `<div class="error-message" style="
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        padding: 10px;
+        color: #721c24;
+        font-size: 14px;
+        line-height: 1.4;
+      ">${message}</div>`;
+      messageContainer.style.display = "block";
+    }
+  }
+
+  private hideMessage(): void {
+    const messageContainer = document.getElementById("messageContainer");
+    if (messageContainer) {
+      messageContainer.style.display = "none";
+      messageContainer.innerHTML = "";
     }
   }
 }
