@@ -1,5 +1,5 @@
 const sparnatural = document.querySelector("spar-natural");
-const sparnaturalHistory = document.querySelector("sparnatural-history");
+const sparnaturalText2Query = document.querySelector("sparnatural-text-query");
 
 let lastquery = null;
 
@@ -33,26 +33,17 @@ const yasr = new Yasr(document.getElementById("yasr"), {
   persistency: { prefix: false, results: { key: false } },
 });
 
-
-
 sparnatural.addEventListener("init", (event) => {
-
   // Inject sparnatural configuration in history
-  sparnaturalHistory.notifyConfiguration(event.detail.config);
+  sparnaturalText2Query.notifyConfiguration(event.detail.config);
 
   // Notify all plugins of configuration updates if they support it
   for (const plugin in yasr.plugins) {
     if (yasr.plugins[plugin].notifyConfiguration) {
       console.log("notifying configuration for plugin " + plugin);
-      yasr.plugins[plugin].notifyConfiguration(
-        event.detail.config
-      );
+      yasr.plugins[plugin].notifyConfiguration(event.detail.config);
     }
   }
-});
-
-document.getElementById("myCustomButton").addEventListener("click", () => {
-  sparnaturalHistory.openHistoryModal();
 });
 
 sparnatural.addEventListener("queryUpdated", (event) => {
@@ -115,15 +106,12 @@ sparnatural.addEventListener("queryUpdated", (event) => {
 sparnatural.addEventListener("submit", (event) => {
   sparnatural.disablePlayBtn();
 
-  // store query in history
-  sparnaturalHistory.saveQuery(lastquery);
-
   // Exécuter la requête via YASQE
   yasqe.query();
 });
 
 // load query from history
-sparnaturalHistory.addEventListener("loadQuery", (event) => {
+sparnaturalText2Query.addEventListener("loadQuery", (event) => {
   const query = event.detail.query;
   sparnatural.loadQuery(query);
 });

@@ -11,7 +11,7 @@ const BundleAnalyzerPlugin =
 module.exports = {
   entry: {
     "sparnatural-text-query": [
-      "./src/SparnaturalText2QueryElement.ts",
+      "./src/SparnaturalText2QureyElement.ts",
       "./scss/sparnatural-text-query.scss",
     ],
     "sparnatural-services": ["./src/services/SparnaturalServicesElement.ts"],
