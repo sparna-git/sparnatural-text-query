@@ -1,76 +1,140 @@
-.new-query-container-mistral {
-  max-width: 900px;
-  margin: 30px auto;
-  font-family: sans-serif;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 10px;
-}
+// Import d'un thème CSS classique (pas SCSS, reste en @import)
+@import "sparnatural/scss/themes/sparnatural-theme-grass.css";
 
-.voice-textarea-wrapper textarea {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  resize: vertical;
-}
-
-.btn-send button {
-  padding: 10px 16px;
-  background-color: rgb(2, 184, 117);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 15px;
-}
-
-.btn-send button:hover {
-  background-color: rgb(2, 184, 117, 0.8);
-}
-
-#btnVoice {
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-size: 18px;
-  cursor: pointer;
-  color: #333;
-}
-
-#btnVoice:hover {
-  background-color: #e0e0e0;
-}
-
-#btnVoice.recording i {
-  animation: pulse 1s infinite;
-  color: rgb(72, 206, 152);
-}
-
-#btnVoice.loading i {
-  animation: spin 1s linear infinite;
-  color: #007bff;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
+sparnatural-text-query {
+  .new-query-container-mistral {
+    max-width: 900px;
+    margin: 30px auto;
+    font-family: sans-serif;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 10px;
   }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+  .voice-textarea-wrapper textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: vertical;
+  }
+
+  .btn-send {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 10px;
+    flex-wrap: nowrap;
+    position: relative;
+  }
+
+  .message-container {
+    flex: 1 1 auto;
+    display: block;
+    min-width: 0;
+    margin-right: auto;
+  }
+
+  .btn-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-left: auto;
+    position: sticky;
+    right: 0;
+  }
+
+  .btn-send button,
+  .btn-actions button {
+    padding: 10px 16px;
+    background-color: rgb(2, 184, 117);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+
+    &:hover {
+      background-color: rgba(2, 184, 117, 0.8);
+    }
+  }
+
+  #btnVoice {
+    background-color: #f0f0f0;
+    color: #333;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+
+    &.recording i {
+      animation: pulse 1s infinite;
+      color: rgb(72, 206, 152);
+    }
+
+    &.loading i {
+      animation: spin 1s linear infinite;
+      color: #007bff;
+    }
+  }
+
+  #exampleSelect {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+    color: #495057;
+    cursor: pointer;
+  }
+
+  .warning-message,
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    max-width: 740px;
+  }
+
+  .warning-message {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+  }
+
+  .error-message {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 }

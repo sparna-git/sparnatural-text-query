@@ -19,67 +19,102 @@ class AreaTextQuery extends HTMLComponent {
   render(): this {
     super.render();
 
-    // Create the main container
     const container = document.createElement("div");
     container.className = "new-query-container-mistral";
 
-    // Create textarea wrapper
     const textareaWrapper = document.createElement("div");
     textareaWrapper.className = "voice-textarea-wrapper";
 
-    // Create textarea
+    const exampleSelect = document.createElement("select");
+    exampleSelect.id = "exampleSelect";
+
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent =
+      SparnaturalTextQueryI18n.labels["select-example"];
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    exampleSelect.appendChild(defaultOption);
+
+    const examples = [
+      "Find all museums in France",
+      "What artists were born in Algeria?",
+      "List all movements where the participating artists are from Italy",
+    ];
+
+    examples.forEach((example) => {
+      const option = document.createElement("option");
+      option.value = example;
+      option.textContent = example;
+      exampleSelect.appendChild(option);
+    });
+
+    exampleSelect.onchange = () => {
+      const textarea = document.getElementById(
+        "naturalRequest"
+      ) as HTMLTextAreaElement;
+      if (textarea && exampleSelect.value) {
+        textarea.value = exampleSelect.value;
+        textarea.focus();
+        exampleSelect.selectedIndex = 0;
+      }
+    };
+
+    textareaWrapper.appendChild(exampleSelect);
+
     const textarea = document.createElement("textarea");
     textarea.id = "naturalRequest";
     textarea.rows = 2;
     textarea.setAttribute("data-i18n-placeholder", "Exemple");
     textarea.placeholder =
       "Ex : Donne-moi toutes les œuvres exposées en France";
-
     textareaWrapper.appendChild(textarea);
-
-    // Create buttons container
+    // ✅ Créer le conteneur btn-send
     const btnContainer = document.createElement("div");
     btnContainer.className = "btn-send";
-    btnContainer.style.cssText =
-      "display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;";
 
-    // Create voice button
+    // ⚠️ Message d'erreur / alerte
+    const messageContainer = document.createElement("div");
+    messageContainer.id = "messageContainer";
+    messageContainer.className = "message-container";
+    messageContainer.setAttribute("role", "alert");
+    btnContainer.appendChild(messageContainer); // ← message à gauche
+
+    // ✅ Créer le conteneur des boutons à droite
+    const actionsWrapper = document.createElement("div");
+    actionsWrapper.className = "btn-actions";
+
+    // 🎤 Bouton vocal
     const btnVoice = document.createElement("button");
     btnVoice.id = "btnVoice";
     btnVoice.setAttribute("aria-label", "Micro");
     btnVoice.onclick = this.startVoiceToQuery.bind(this);
-
     const micIcon = document.createElement("i");
     micIcon.id = "micIcon";
     micIcon.className = "fas fa-microphone";
     btnVoice.appendChild(micIcon);
+    actionsWrapper.appendChild(btnVoice);
 
-    // Create send button
+    // ✉️ Bouton envoyer
     const btnSend = document.createElement("button");
     btnSend.id = "btnSend";
     btnSend.setAttribute("data-i18n", "send");
-    btnSend.onclick = this.sendNaturalRequest.bind(this);
     btnSend.textContent = "Envoyer";
+    btnSend.onclick = this.sendNaturalRequest.bind(this);
+    actionsWrapper.appendChild(btnSend);
 
-    btnContainer.appendChild(btnVoice);
-    btnContainer.appendChild(btnSend);
+    // ✅ Ajout du wrapper à droite dans btnContainer
+    btnContainer.appendChild(actionsWrapper);
 
+    // Injection dans le DOM
     container.appendChild(textareaWrapper);
     container.appendChild(btnContainer);
 
-    // Create message container for warnings/errors
-    const messageContainer = document.createElement("div");
-    messageContainer.id = "messageContainer";
-    messageContainer.className = "message-container";
-    messageContainer.style.cssText = "margin-top: 10px; display: none;";
-    container.appendChild(messageContainer);
-
     this.html.append(container);
-
     return this;
   }
 
-  private async sendNaturalRequest(): Promise<void> {
+  private async sendNaturalRequest1(): Promise<void> {
     const prompt = (
       document.getElementById("naturalRequest") as HTMLTextAreaElement
     ).value.trim();
@@ -121,6 +156,85 @@ class AreaTextQuery extends HTMLComponent {
       }
 
       this.loadQuery(json);
+    } catch (err: any) {
+      console.error("Erreur lors de l'envoi de la requête :", err);
+      this.showErrorMessage(
+        "❌ Erreur lors de l'envoi de la requête : " + err.message
+      );
+    } finally {
+      sendButton.innerHTML = originalText || "Envoyer";
+      sendButton.disabled = false;
+    }
+  }
+
+  private async sendNaturalRequest(): Promise<void> {
+    const prompt = (
+      document.getElementById("naturalRequest") as HTMLTextAreaElement
+    ).value.trim();
+    const sendButton = document.getElementById("btnSend") as HTMLButtonElement;
+
+    if (!prompt) {
+      this.showErrorMessage("❌ Veuillez entrer une requête naturelle.");
+      return;
+    }
+
+    const originalText = sendButton.innerHTML;
+    sendButton.disabled = true;
+    sendButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+
+    const mistralApiUrl = getSettingsServices().href;
+    const url = `${mistralApiUrl}text2query?text=${encodeURIComponent(prompt)}`;
+    console.log("URL de la requête :", url);
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+      const json = await res.json();
+
+      // Vérifie les URI non trouvées
+      const notFoundValues = this.detectNotFoundValues(json);
+      const hasNotFound = notFoundValues.length > 0;
+      if (hasNotFound) {
+        const valuesList = notFoundValues
+          .map((v: string) => `"${v}"`)
+          .join(", ");
+        this.showWarningMessage(
+          `${SparnaturalTextQueryI18n.labels["warning-1"]} ${valuesList}${SparnaturalTextQueryI18n.labels["warning-2"]}`,
+          (window as any).$,
+          { valuesList },
+          null
+        );
+      }
+
+      // Vérifie le champ explanation dans metadata
+      let hasExplanation = false;
+      if (json.metadata && typeof json.metadata.explanation === "string") {
+        hasExplanation = true;
+        this.showWarningMessage(
+          `⚠️ ${json.metadata.explanation}`,
+          (window as any).$,
+          { valuesList: "" },
+          null
+        );
+      }
+
+      // Si aucun message à afficher
+      if (!hasNotFound && !hasExplanation) {
+        this.hideMessage();
+      }
+
+      // Nettoyage de la requête : suppression de metadata.explanation
+      const cleanQuery = {
+        ...json,
+        metadata: {
+          ...json.metadata,
+        },
+      };
+      if (cleanQuery.metadata && cleanQuery.metadata.explanation) {
+        delete cleanQuery.metadata.explanation;
+      }
+
+      this.loadQuery(cleanQuery);
     } catch (err: any) {
       console.error("Erreur lors de l'envoi de la requête :", err);
       this.showErrorMessage(
@@ -273,15 +387,7 @@ class AreaTextQuery extends HTMLComponent {
   ): void {
     const messageContainer = document.getElementById("messageContainer");
     if (messageContainer) {
-      messageContainer.innerHTML = `<div class="warning-message" style="
-        background-color: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 4px;
-        padding: 10px;
-        color: #856404;
-        font-size: 14px;
-        line-height: 1.4;
-      ">${message}</div>`;
+      messageContainer.innerHTML = `<div class="warning-message">${message}</div>`;
       messageContainer.style.display = "block";
     }
   }
@@ -289,15 +395,7 @@ class AreaTextQuery extends HTMLComponent {
   private showErrorMessage(message: string): void {
     const messageContainer = document.getElementById("messageContainer");
     if (messageContainer) {
-      messageContainer.innerHTML = `<div class="error-message" style="
-        background-color: #f8d7da;
-        border: 1px solid #f5c6cb;
-        border-radius: 4px;
-        padding: 10px;
-        color: #721c24;
-        font-size: 14px;
-        line-height: 1.4;
-      ">${message}</div>`;
+      messageContainer.innerHTML = `<div class="error-message">${message}</div>`;
       messageContainer.style.display = "block";
     }
   }
