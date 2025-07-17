@@ -37,9 +37,9 @@ class AreaTextQuery extends HTMLComponent {
     exampleSelect.appendChild(defaultOption);
 
     const examples = [
-      "Find all museums in France",
-      "What artists were born in Algeria?",
-      "List all movements where the participating artists are from Italy",
+      SparnaturalTextQueryI18n.labels["example-1"],
+      SparnaturalTextQueryI18n.labels["example-2"],
+      SparnaturalTextQueryI18n.labels["example-3"],
     ];
 
     examples.forEach((example) => {
