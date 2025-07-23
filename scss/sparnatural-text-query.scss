@@ -7,8 +7,9 @@ sparnatural-text-query {
     margin: 20px auto auto;
     font-family: sans-serif;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
     padding: 10px;
+    background: rgba(220, 255, 241, 0.7);
   }
 
   .voice-textarea-wrapper textarea {
