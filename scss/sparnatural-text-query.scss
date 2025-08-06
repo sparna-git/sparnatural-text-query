@@ -6,10 +6,10 @@ sparnatural-text-query {
     max-width: 900px;
     margin: 20px auto auto;
     font-family: sans-serif;
-    border-radius: 12px;
+    //border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
     padding: 10px;
-    background: rgba(220, 255, 241, 0.7);
+    background: rgba(29, 224, 153, 0.1);
   }
 
   .voice-textarea-wrapper textarea {
@@ -45,6 +45,7 @@ sparnatural-text-query {
     margin-left: auto;
     position: sticky;
     right: 0;
+    align-items: center;
   }
 
   .btn-send button,
@@ -55,7 +56,7 @@ sparnatural-text-query {
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 17px;
 
     &:hover {
       background-color: rgba(2, 184, 117, 0.8);
@@ -82,13 +83,17 @@ sparnatural-text-query {
   }
 
   #exampleSelect {
-    width: 100%;
+    //width: 100%;
+    width: auto;
+    max-width: 210px;
+    height: 45.5px;
     padding: 8px 12px;
-    margin-bottom: 10px;
+    margin: 0;
+    //margin-bottom: 10px;
     border: 1px solid #dee2e6;
     border-radius: 4px;
     background-color: #fff;
-    font-size: 14px;
+    font-size: 15px;
     color: #495057;
     cursor: pointer;
   }

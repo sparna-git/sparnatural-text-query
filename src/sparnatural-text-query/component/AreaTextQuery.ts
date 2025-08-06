@@ -25,6 +25,30 @@ class AreaTextQuery extends HTMLComponent {
     const textareaWrapper = document.createElement("div");
     textareaWrapper.className = "voice-textarea-wrapper";
 
+    const textarea = document.createElement("textarea");
+    textarea.id = "naturalRequest";
+    textarea.rows = 2;
+    textarea.setAttribute("data-i18n-placeholder", "Exemple");
+    textarea.placeholder =
+      "Ex : Donne-moi toutes les œuvres exposées en France";
+    textareaWrapper.appendChild(textarea);
+
+    // ✅ Créer le conteneur btn-send
+    const btnContainer = document.createElement("div");
+    btnContainer.className = "btn-send";
+
+    // ⚠️ Message d'erreur / alerte
+    const messageContainer = document.createElement("div");
+    messageContainer.id = "messageContainer";
+    messageContainer.className = "message-container";
+    messageContainer.setAttribute("role", "alert");
+    btnContainer.appendChild(messageContainer); // ← message à gauche
+
+    // ✅ Créer le conteneur des boutons à droite
+    const actionsWrapper = document.createElement("div");
+    actionsWrapper.className = "btn-actions";
+
+    // ⬇️ Select des exemples (placé AVANT les boutons)
     const exampleSelect = document.createElement("select");
     exampleSelect.id = "exampleSelect";
 
@@ -40,6 +64,7 @@ class AreaTextQuery extends HTMLComponent {
       SparnaturalTextQueryI18n.labels["example-1"],
       SparnaturalTextQueryI18n.labels["example-2"],
       SparnaturalTextQueryI18n.labels["example-3"],
+      SparnaturalTextQueryI18n.labels["example-4"],
     ];
 
     examples.forEach((example) => {
@@ -60,29 +85,7 @@ class AreaTextQuery extends HTMLComponent {
       }
     };
 
-    textareaWrapper.appendChild(exampleSelect);
-
-    const textarea = document.createElement("textarea");
-    textarea.id = "naturalRequest";
-    textarea.rows = 2;
-    textarea.setAttribute("data-i18n-placeholder", "Exemple");
-    textarea.placeholder =
-      "Ex : Donne-moi toutes les œuvres exposées en France";
-    textareaWrapper.appendChild(textarea);
-    // ✅ Créer le conteneur btn-send
-    const btnContainer = document.createElement("div");
-    btnContainer.className = "btn-send";
-
-    // ⚠️ Message d'erreur / alerte
-    const messageContainer = document.createElement("div");
-    messageContainer.id = "messageContainer";
-    messageContainer.className = "message-container";
-    messageContainer.setAttribute("role", "alert");
-    btnContainer.appendChild(messageContainer); // ← message à gauche
-
-    // ✅ Créer le conteneur des boutons à droite
-    const actionsWrapper = document.createElement("div");
-    actionsWrapper.className = "btn-actions";
+    actionsWrapper.appendChild(exampleSelect); // ✅ ajouté AVANT les boutons
 
     // 🎤 Bouton vocal
     const btnVoice = document.createElement("button");
@@ -98,12 +101,11 @@ class AreaTextQuery extends HTMLComponent {
     // ✉️ Bouton envoyer
     const btnSend = document.createElement("button");
     btnSend.id = "btnSend";
-    btnSend.setAttribute("data-i18n", "send");
-    btnSend.textContent = "Envoyer";
     btnSend.onclick = this.sendNaturalRequest.bind(this);
+    btnSend.innerHTML = '<i class="fa-solid fa-arrow-down"></i>';
     actionsWrapper.appendChild(btnSend);
 
-    // ✅ Ajout du wrapper à droite dans btnContainer
+    // ✅ Ajout du wrapper dans btnContainer
     btnContainer.appendChild(actionsWrapper);
 
     // Injection dans le DOM

@@ -2,7 +2,28 @@
   "name": "sparnatural-text-query",
   "version": "1.0.0",
   "description": "Sparnatural Text Query Element",
-  "main": "dist/sparnatural-text-query.js",
+  "main": "dist/js/sparnatural-text-query.js",
+  "module": "dist/js/sparnatural-text-query.js",
+  "types": "dist/types/sparnatural-text-query.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/js/sparnatural-text-query.js",
+      "require": "./dist/js/sparnatural-text-query.js",
+      "types": "./dist/types/sparnatural-text-query.d.ts",
+      "style": "./dist/css/sparnatural-text-query.css",
+      "sass": "./scss/sparnatural-text-query.scss"
+    },
+    "./dist/browser": "./dist/browser/sparnatural-text-query.js",
+    "./scss/*": "./scss/*"
+  },
+  "style": "dist/browser/sparnatural-text-query.css",
+  "files": [
+    "dist",
+    "scss"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "build": "webpack --config webpack.config.js --mode production",
     "start": "webpack serve --hot --config webpack.config.js --mode development"

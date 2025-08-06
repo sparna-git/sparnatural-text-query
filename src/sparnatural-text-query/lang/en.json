@@ -6,5 +6,6 @@
   "select-example": "Select an example query...",
   "example-1": "Find all museums in France",
   "example-2": "What artists were born in Algeria?",
-  "example-3": "List all movements where the participating artists are from Italy"
+  "example-3": "List all movements where the participating artists are from Italy",
+  "example-4": "Baroque artworks"
 }
