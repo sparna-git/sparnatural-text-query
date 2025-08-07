@@ -115,7 +115,6 @@ class AreaTextQuery extends HTMLComponent {
     this.html.append(container);
     return this;
   }
-
   private async sendNaturalRequest(): Promise<void> {
     const prompt = (
       document.getElementById("naturalRequest") as HTMLTextAreaElement
@@ -139,7 +138,26 @@ class AreaTextQuery extends HTMLComponent {
 
     try {
       const res = await fetch(url);
+
+      // Cas particulier : 204 avec contenu JSON ou sans contenu
+      if (res.status === 204) {
+        let explanation =
+          SparnaturalTextQueryI18n.labels["error-empty-response"];
+
+        try {
+          const json = await res.json();
+          if (json?.metadata?.explanation) {
+            explanation = json.metadata.explanation;
+          }
+        } catch (e) {
+          // Pas de JSON, on garde le message par défaut
+        }
+
+        throw new Error(explanation);
+      }
+
       if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+
       const json = await res.json();
 
       // Vérifie les URI non trouvées
@@ -169,7 +187,6 @@ class AreaTextQuery extends HTMLComponent {
         );
       }
 
-      // Si aucun message à afficher
       if (!hasNotFound && !hasExplanation) {
         this.hideMessage();
       }
@@ -189,7 +206,7 @@ class AreaTextQuery extends HTMLComponent {
     } catch (err: any) {
       console.error("Erreur lors de l'envoi de la requête :", err);
       this.showErrorMessage(
-        "❌ Erreur lors de l'envoi de la requête : " + err.message
+        err?.message || SparnaturalTextQueryI18n.labels["error-not-understood"]
       );
     } finally {
       sendButton.innerHTML = originalText || "Envoyer";
@@ -361,3 +378,87 @@ class AreaTextQuery extends HTMLComponent {
 }
 
 export default AreaTextQuery;
+
+/*
+  private async sendNaturalRequest1(): Promise<void> {
+    const prompt = (
+      document.getElementById("naturalRequest") as HTMLTextAreaElement
+    ).value.trim();
+    const sendButton = document.getElementById("btnSend") as HTMLButtonElement;
+
+    if (!prompt) {
+      this.showErrorMessage(
+        SparnaturalTextQueryI18n.labels["error-empty-prompt"]
+      );
+      return;
+    }
+
+    const originalText = sendButton.innerHTML;
+    sendButton.disabled = true;
+    sendButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+
+    const mistralApiUrl = getSettingsServices().href;
+    const url = `${mistralApiUrl}text2query?text=${encodeURIComponent(prompt)}`;
+    console.log("URL de la requête :", url);
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+      const json = await res.json();
+
+      // Vérifie les URI non trouvées
+      const notFoundValues = this.detectNotFoundValues(json);
+      const hasNotFound = notFoundValues.length > 0;
+      if (hasNotFound) {
+        const valuesList = notFoundValues
+          .map((v: string) => `"${v}"`)
+          .join(", ");
+        this.showWarningMessage(
+          `${SparnaturalTextQueryI18n.labels["warning-1"]} ${valuesList}${SparnaturalTextQueryI18n.labels["warning-2"]}`,
+          (window as any).$,
+          { valuesList },
+          null
+        );
+      }
+
+      // Vérifie le champ explanation dans metadata
+      let hasExplanation = false;
+      if (json.metadata && typeof json.metadata.explanation === "string") {
+        hasExplanation = true;
+        this.showWarningMessage(
+          `⚠️ ${json.metadata.explanation}`,
+          (window as any).$,
+          { valuesList: "" },
+          null
+        );
+      }
+
+      // Si aucun message à afficher
+      if (!hasNotFound && !hasExplanation) {
+        this.hideMessage();
+      }
+
+      // Nettoyage de la requête : suppression de metadata.explanation
+      const cleanQuery = {
+        ...json,
+        metadata: {
+          ...json.metadata,
+        },
+      };
+      if (cleanQuery.metadata && cleanQuery.metadata.explanation) {
+        delete cleanQuery.metadata.explanation;
+      }
+
+      this.loadQuery(cleanQuery);
+    } catch (err: any) {
+      console.error("Erreur lors de l'envoi de la requête :", err);
+      this.showErrorMessage(
+        "❌ Erreur lors de l'envoi de la requête : " + err.message
+      );
+    } finally {
+      sendButton.innerHTML = originalText || "Envoyer";
+      sendButton.disabled = false;
+    }
+  }
+
+*/
