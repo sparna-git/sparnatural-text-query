@@ -123,7 +123,9 @@ class AreaTextQuery extends HTMLComponent {
     const sendButton = document.getElementById("btnSend") as HTMLButtonElement;
 
     if (!prompt) {
-      this.showErrorMessage("❌ Veuillez entrer une requête naturelle.");
+      this.showErrorMessage(
+        SparnaturalTextQueryI18n.labels["error-empty-prompt"]
+      );
       return;
     }
 

@@ -7,5 +7,6 @@
   "example-1": "Find all museums in France",
   "example-2": "What artists were born in Algeria?",
   "example-3": "List all movements where the participating artists are from Italy",
-  "example-4": "Baroque artworks"
+  "example-4": "Baroque artworks",
+  "error-empty-prompt": "The input field is empty. Please enter a query."
 }

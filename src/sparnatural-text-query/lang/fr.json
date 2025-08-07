@@ -7,5 +7,6 @@
   "example-1": "Trouver tous les musées en France",
   "example-2": "Quels artistes sont nés en Algérie?",
   "example-3": "Lister tous les mouvements dont les artistes participants sont originaires d'Italie",
-  "example-4": "Œuvres baroques"
+  "example-4": "Œuvres baroques",
+  "error-empty-prompt": "Le champ de saisie est vide. Veuillez entrer une requête."
 }
