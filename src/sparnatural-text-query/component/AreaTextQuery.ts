@@ -116,7 +116,7 @@ class AreaTextQuery extends HTMLComponent {
     return this;
   }
 
-  private async sendNaturalRequest1(): Promise<void> {
+  private async sendNaturalRequest(): Promise<void> {
     const prompt = (
       document.getElementById("naturalRequest") as HTMLTextAreaElement
     ).value.trim();
@@ -126,59 +126,6 @@ class AreaTextQuery extends HTMLComponent {
       this.showErrorMessage(
         SparnaturalTextQueryI18n.labels["error-empty-prompt"]
       );
-      return;
-    }
-
-    // Sauvegarder le texte initial et mettre le loading spinner
-    const originalText = sendButton.innerHTML;
-    sendButton.disabled = true;
-    sendButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-
-    const mistralApiUrl = getSettingsServices().href;
-    const url = `${mistralApiUrl}text2query?text=${encodeURIComponent(prompt)}`;
-    console.log("URL de la requête :", url);
-
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
-      const json = await res.json();
-
-      // Check for URI_NOT_FOUND values
-      const notFoundValues = this.detectNotFoundValues(json);
-      if (notFoundValues.length > 0) {
-        const valuesList = notFoundValues
-          .map((v: string) => `"${v}"`)
-          .join(", ");
-        this.showWarningMessage(
-          `${SparnaturalTextQueryI18n.labels["warning-1"]} ${valuesList}${SparnaturalTextQueryI18n.labels["warning-2"]}`,
-          (window as any).$,
-          { valuesList },
-          null
-        );
-      } else {
-        this.hideMessage();
-      }
-
-      this.loadQuery(json);
-    } catch (err: any) {
-      console.error("Erreur lors de l'envoi de la requête :", err);
-      this.showErrorMessage(
-        "❌ Erreur lors de l'envoi de la requête : " + err.message
-      );
-    } finally {
-      sendButton.innerHTML = originalText || "Envoyer";
-      sendButton.disabled = false;
-    }
-  }
-
-  private async sendNaturalRequest(): Promise<void> {
-    const prompt = (
-      document.getElementById("naturalRequest") as HTMLTextAreaElement
-    ).value.trim();
-    const sendButton = document.getElementById("btnSend") as HTMLButtonElement;
-
-    if (!prompt) {
-      this.showErrorMessage("❌ Veuillez entrer une requête naturelle.");
       return;
     }
 
