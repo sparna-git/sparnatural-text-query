@@ -9,5 +9,6 @@
   "example-3": "List all movements where the participating artists are from Italy",
   "example-4": "Baroque artworks",
   "error-empty-prompt": "The input field is empty. Please enter a query.",
-  "error-not-understood": "The query was not understood"
+  "error-not-understood": "The query was not understood",
+  "ia-response": "⚠️ Agent AI Response: "
 }

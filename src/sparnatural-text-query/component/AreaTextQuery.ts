@@ -180,7 +180,8 @@ class AreaTextQuery extends HTMLComponent {
       if (json.metadata && typeof json.metadata.explanation === "string") {
         hasExplanation = true;
         this.showWarningMessage(
-          `⚠️ ${json.metadata.explanation}`,
+          SparnaturalTextQueryI18n.labels["ia-response"] +
+            `${json.metadata.explanation}`,
           (window as any).$,
           { valuesList: "" },
           null
@@ -460,5 +461,4 @@ export default AreaTextQuery;
       sendButton.disabled = false;
     }
   }
-
 */
