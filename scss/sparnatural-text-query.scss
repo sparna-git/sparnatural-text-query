@@ -4,12 +4,118 @@
 sparnatural-text-query {
   .new-query-container-mistral {
     max-width: 900px;
-    margin: 20px auto auto;
+    margin: 0 auto auto;
     font-family: sans-serif;
     //border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
     padding: 10px;
     background: rgba(29, 224, 153, 0.1);
+  }
+
+  // Nouveau style pour l'input container
+  .input-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 10px;
+    position: relative;
+
+    textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      font-family: inherit;
+      resize: none;
+      overflow: hidden;
+      background: transparent;
+      min-height: 24px;
+      line-height: 1.5;
+      padding: 0;
+      margin: 0;
+
+      &::placeholder {
+        color: #999;
+      }
+    }
+  }
+
+  // Conteneur des actions à droite
+  .input-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  // Style des boutons icônes
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 16px;
+    background-color: #f8f9fa;
+    color: #495057;
+
+    &:hover {
+      background-color: #e9ecef;
+    }
+
+    &.btn-send-primary {
+      background-color: rgb(2, 184, 117);
+      color: white;
+
+      &:hover {
+        background-color: rgba(2, 184, 117, 0.8);
+      }
+    }
+  }
+
+  // Dropdown des exemples
+  .examples-dropdown {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 300px;
+    max-width: 400px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 4px;
+
+    .example-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+      line-height: 1.4;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
   }
 
   .voice-textarea-wrapper textarea {
@@ -22,32 +128,19 @@ sparnatural-text-query {
   }
 
   .btn-send {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 16px;
-    margin-top: 10px;
-    flex-wrap: nowrap;
-    position: relative;
+    display: none; // Plus utilisé avec la nouvelle disposition
   }
 
   .message-container {
-    flex: 1 1 auto;
     display: block;
-    min-width: 0;
-    margin-right: auto;
+    margin-top: 10px;
   }
 
   .btn-actions {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-    margin-left: auto;
-    position: sticky;
-    right: 0;
-    align-items: center;
+    display: none; // Remplacé par .input-actions
   }
 
+  // Anciens styles pour compatibilité, mais remplacés par .btn-icon
   .btn-send button,
   .btn-actions button {
     padding: 10px 16px;
@@ -64,13 +157,6 @@ sparnatural-text-query {
   }
 
   #btnVoice {
-    background-color: #f0f0f0;
-    color: #333;
-
-    &:hover {
-      background-color: #e0e0e0;
-    }
-
     &.recording i {
       animation: pulse 1s infinite;
       color: rgb(72, 206, 152);
@@ -82,20 +168,9 @@ sparnatural-text-query {
     }
   }
 
+  // Plus utilisé - remplacé par .examples-dropdown
   #exampleSelect {
-    //width: 100%;
-    width: auto;
-    max-width: 210px;
-    height: 45.5px;
-    padding: 8px 12px;
-    margin: 0;
-    //margin-bottom: 10px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: 15px;
-    color: #495057;
-    cursor: pointer;
+    display: none;
   }
 
   .warning-message,
@@ -108,7 +183,7 @@ sparnatural-text-query {
     font-size: 14px;
     line-height: 1.5;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    max-width: 740px;
+    width: max-content;
   }
 
   .warning-message {

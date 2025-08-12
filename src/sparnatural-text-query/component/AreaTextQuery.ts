@@ -22,43 +22,44 @@ class AreaTextQuery extends HTMLComponent {
     const container = document.createElement("div");
     container.className = "new-query-container-mistral";
 
-    const textareaWrapper = document.createElement("div");
-    textareaWrapper.className = "voice-textarea-wrapper";
+    // ✅ Créer le conteneur principal pour l'input et les boutons
+    const inputContainer = document.createElement("div");
+    inputContainer.className = "input-container";
 
+    // ✅ Créer l'input (textarea transformé en input auto-expandable)
     const textarea = document.createElement("textarea");
     textarea.id = "naturalRequest";
-    textarea.rows = 2;
+    textarea.rows = 1;
+    textarea.style.resize = "none";
+    textarea.style.overflow = "hidden";
     textarea.setAttribute("data-i18n-placeholder", "Exemple");
     textarea.placeholder =
-      "Ex : Donne-moi toutes les œuvres exposées en France";
-    textareaWrapper.appendChild(textarea);
+      "Ex : Donne-moi toutes les œuvres exposées en France (Ctrl+Espace pour suggestions)";
 
-    // ✅ Créer le conteneur btn-send
-    const btnContainer = document.createElement("div");
-    btnContainer.className = "btn-send";
+    // Auto-expand functionality
+    textarea.addEventListener("input", () => {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    });
 
-    // ⚠️ Message d'erreur / alerte
-    const messageContainer = document.createElement("div");
-    messageContainer.id = "messageContainer";
-    messageContainer.className = "message-container";
-    messageContainer.setAttribute("role", "alert");
-    btnContainer.appendChild(messageContainer); // ← message à gauche
+    inputContainer.appendChild(textarea);
 
-    // ✅ Créer le conteneur des boutons à droite
+    // ✅ Créer le conteneur des boutons à droite de l'input
     const actionsWrapper = document.createElement("div");
-    actionsWrapper.className = "btn-actions";
+    actionsWrapper.className = "input-actions";
 
-    // ⬇️ Select des exemples (placé AVANT les boutons)
-    const exampleSelect = document.createElement("select");
-    exampleSelect.id = "exampleSelect";
+    // 📋 Bouton exemples (icône au lieu de select)
+    const btnExamples = document.createElement("button");
+    btnExamples.id = "btnExamples";
+    btnExamples.setAttribute("aria-label", "Exemples");
+    btnExamples.className = "btn-icon";
+    btnExamples.innerHTML = '<i class="fas fa-list"></i>';
 
-    const defaultOption = document.createElement("option");
-    defaultOption.value = "";
-    defaultOption.textContent =
-      SparnaturalTextQueryI18n.labels["select-example"];
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    exampleSelect.appendChild(defaultOption);
+    // Créer le dropdown des exemples (masqué par défaut)
+    const examplesDropdown = document.createElement("div");
+    examplesDropdown.id = "examplesDropdown";
+    examplesDropdown.className = "examples-dropdown";
+    examplesDropdown.style.display = "none";
 
     const examples = [
       SparnaturalTextQueryI18n.labels["example-1"],
@@ -68,29 +69,42 @@ class AreaTextQuery extends HTMLComponent {
     ];
 
     examples.forEach((example) => {
-      const option = document.createElement("option");
-      option.value = example;
-      option.textContent = example;
-      exampleSelect.appendChild(option);
+      const exampleItem = document.createElement("div");
+      exampleItem.className = "example-item";
+      exampleItem.textContent = example;
+      exampleItem.onclick = () => {
+        textarea.value = example;
+        textarea.focus();
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+        examplesDropdown.style.display = "none";
+      };
+      examplesDropdown.appendChild(exampleItem);
     });
 
-    exampleSelect.onchange = () => {
-      const textarea = document.getElementById(
-        "naturalRequest"
-      ) as HTMLTextAreaElement;
-      if (textarea && exampleSelect.value) {
-        textarea.value = exampleSelect.value;
-        textarea.focus();
-        exampleSelect.selectedIndex = 0;
-      }
+    btnExamples.onclick = () => {
+      const isVisible = examplesDropdown.style.display === "block";
+      examplesDropdown.style.display = isVisible ? "none" : "block";
     };
 
-    actionsWrapper.appendChild(exampleSelect); // ✅ ajouté AVANT les boutons
+    // Fermer le dropdown si on clique ailleurs
+    document.addEventListener("click", (event) => {
+      if (
+        !btnExamples.contains(event.target as Node) &&
+        !examplesDropdown.contains(event.target as Node)
+      ) {
+        examplesDropdown.style.display = "none";
+      }
+    });
+
+    actionsWrapper.appendChild(btnExamples);
+    actionsWrapper.appendChild(examplesDropdown);
 
     // 🎤 Bouton vocal
     const btnVoice = document.createElement("button");
     btnVoice.id = "btnVoice";
     btnVoice.setAttribute("aria-label", "Micro");
+    btnVoice.className = "btn-icon";
     btnVoice.onclick = this.startVoiceToQuery.bind(this);
     const micIcon = document.createElement("i");
     micIcon.id = "micIcon";
@@ -101,16 +115,22 @@ class AreaTextQuery extends HTMLComponent {
     // ✉️ Bouton envoyer
     const btnSend = document.createElement("button");
     btnSend.id = "btnSend";
+    btnSend.className = "btn-icon btn-send-primary";
     btnSend.onclick = this.sendNaturalRequest.bind(this);
-    btnSend.innerHTML = '<i class="fa-solid fa-arrow-down"></i>';
+    btnSend.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
     actionsWrapper.appendChild(btnSend);
 
-    // ✅ Ajout du wrapper dans btnContainer
-    btnContainer.appendChild(actionsWrapper);
+    inputContainer.appendChild(actionsWrapper);
+
+    // ⚠️ Message d'erreur / alerte (en dessous de l'input)
+    const messageContainer = document.createElement("div");
+    messageContainer.id = "messageContainer";
+    messageContainer.className = "message-container";
+    messageContainer.setAttribute("role", "alert");
 
     // Injection dans le DOM
-    container.appendChild(textareaWrapper);
-    container.appendChild(btnContainer);
+    container.appendChild(inputContainer);
+    container.appendChild(messageContainer);
 
     this.html.append(container);
     return this;
