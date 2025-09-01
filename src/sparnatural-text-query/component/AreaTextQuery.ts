@@ -34,7 +34,7 @@ class AreaTextQuery extends HTMLComponent {
     textarea.style.overflow = "hidden";
     textarea.setAttribute("data-i18n-placeholder", "Exemple");
     textarea.placeholder =
-      "Ex : Donne-moi toutes les œuvres exposées en France (Ctrl+Espace pour suggestions)";
+      "Ex : Donne-moi toutes les œuvres exposées en France";
 
     // Auto-expand functionality
     textarea.addEventListener("input", () => {
