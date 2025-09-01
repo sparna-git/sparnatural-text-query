@@ -74,16 +74,23 @@
           <div>
             <sparnatural-text-query lang="en">
               <sparnatural-services
-                href="https://services.sparnatural.eu/api/v1/dbpedia-en/"
+                href="http://localhost:3000/api/v1/dbpedia-en/"
               ></sparnatural-services>
             </sparnatural-text-query>
+          </div>
+          <div class="row" style="margin-top: 1em; margin-bottom: 1em">
+            <div class="col-md-12 text-center">
+              <span style="font-style: italic; font-size: 1.5em" data-i18n="OR"
+                >- OR -</span
+              >
+            </div>
           </div>
           <div id="ui-search" style="width: auto">
             <spar-natural
               src="./configs/dbpediafr-config.ttl"
               lang="en"
               defaultLang="en"
-              endpoint="https://services.sparnatural.eu/api/v1/dbpedia-en/sparql"
+              endpoint="http://localhost:3000/api/v1/dbpedia-en/sparql"
               distinct="true"
               limit="100"
               prefixes="skos:http://www.w3.org/2004/02/skos/core# rico:https://www.ica.org/standards/RiC/ontology# crm:http://www.cidoc-crm.org/cidoc-crm/ grace:http://www.graceful17.org/ontology/"
@@ -104,8 +111,8 @@
                 Les requêtes sont envoyées à
                 <a
                   id="endpoint"
-                  href="https://services.sparnatural.eu/api/v1/dbpedia-en/sparql"
-                  >https://services.sparnatural.eu/api/v1/dbpedia-en/sparql</a
+                  href="http://localhost:3000/api/v1/dbpedia-en/sparql"
+                  >http://localhost:3000/api/v1/dbpedia-en/sparql</a
                 >
               </span>
             </div>
