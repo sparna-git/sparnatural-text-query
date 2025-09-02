@@ -1,5 +1,4 @@
 const sparnatural = document.querySelector("spar-natural");
-const sparnaturalText2Query = document.querySelector("sparnatural-text-query");
 
 let lastquery = null;
 
@@ -34,9 +33,6 @@ const yasr = new Yasr(document.getElementById("yasr"), {
 });
 
 sparnatural.addEventListener("init", (event) => {
-  // Inject sparnatural configuration in history
-  sparnaturalText2Query.notifyConfiguration(event.detail.config);
-
   // Notify all plugins of configuration updates if they support it
   for (const plugin in yasr.plugins) {
     if (yasr.plugins[plugin].notifyConfiguration) {
@@ -108,12 +104,6 @@ sparnatural.addEventListener("submit", (event) => {
 
   // Exécuter la requête via YASQE
   yasqe.query();
-});
-
-// load query from history
-sparnaturalText2Query.addEventListener("loadQuery", (event) => {
-  const query = event.detail.query;
-  sparnatural.loadQuery(query);
 });
 
 // Link yasqe and yasr

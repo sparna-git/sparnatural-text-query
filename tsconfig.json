@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
-    "outDir": "./dist/",
-    "noImplicitAny": true,
-    "module": "es2022",
     "target": "es2021",
-    "allowJs": true,
+    "module": "es2022",
     "moduleResolution": "node",
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "allowJs": true,
+    "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
-    "declaration": false
+    "experimentalDecorators": true, // 🔥 ajoute ça
+    "useDefineForClassFields": false // 🔥 ajoute ça aussi
   },
   "include": ["src/**/*.ts"]
 }
