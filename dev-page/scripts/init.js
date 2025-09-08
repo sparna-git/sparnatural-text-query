@@ -1,4 +1,5 @@
 const sparnatural = document.querySelector("spar-natural");
+const sparnaturalText2Query = document.querySelector("query-container");
 
 let lastquery = null;
 
@@ -104,6 +105,12 @@ sparnatural.addEventListener("submit", (event) => {
 
   // Exécuter la requête via YASQE
   yasqe.query();
+});
+
+// load query from history
+sparnaturalText2Query.addEventListener("loadQuery", (event) => {
+  const query = event.detail.query;
+  sparnatural.loadQuery(query);
 });
 
 // Link yasqe and yasr
