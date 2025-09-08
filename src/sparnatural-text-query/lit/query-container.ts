@@ -9,7 +9,7 @@ import "./query-send";
 export class QueryContainer extends LitElement {
   @property({ type: String }) lang = "en";
   @state() private value = "";
-
+  @state() private serviceHref = "";
   static styles = css`
     :host {
       display: block;
@@ -61,7 +61,22 @@ export class QueryContainer extends LitElement {
       border: 1px solid #f5c6cb;
       color: #721c24;
     }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto; /* pousse tout le bloc à droite */
+    }
   `;
+
+  firstUpdated() {
+    // récupère le sparnatural-services enfant
+    const service = this.querySelector("sparnatural-services") as any;
+    if (service && service.href) {
+      this.serviceHref = service.href;
+      console.log("QueryContainer detected service href:", this.serviceHref);
+    }
+  }
 
   private onInputChange(e: CustomEvent) {
     this.value = e.detail;
@@ -89,17 +104,22 @@ export class QueryContainer extends LitElement {
             : "Ex: Give me all the artworks exhibited in France"}
           @input-change=${this.onInputChange}
         ></query-input>
-        <query-dropdown
-          .options=${[
-            this.lang === "fr" ? "Exemple A" : "Example A",
-            this.lang === "fr" ? "Exemple B" : "Example B",
-          ]}
-          @option-selected=${this.onOptionSelected}
-        ></query-dropdown>
-        <query-microphone @mic-toggle=${this.onMicToggle}></query-microphone>
-        <query-send @send-query=${this.onSend}></query-send>
+
+        <div class="controls">
+          <query-dropdown
+            .options=${[
+              this.lang === "fr" ? "Exemple A" : "Example A",
+              this.lang === "fr" ? "Exemple B" : "Example B",
+            ]}
+            @option-selected=${this.onOptionSelected}
+          ></query-dropdown>
+          <query-microphone @mic-toggle=${this.onMicToggle}></query-microphone>
+          <query-send @send-query=${this.onSend}></query-send>
+        </div>
       </div>
-      <div class="message-container"></div>
+
+      <!-- slot pour sparnatural-services si besoin -->
+      <slot name="services"></slot>
     `;
   }
 }

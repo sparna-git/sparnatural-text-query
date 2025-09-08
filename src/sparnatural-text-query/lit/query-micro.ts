@@ -46,11 +46,38 @@ export class QueryMicrophone extends LitElement {
     }
   `;
 
-  private toggle() {
-    this.recording = !this.recording;
-    this.dispatchEvent(
-      new CustomEvent("mic-toggle", { detail: this.recording })
-    );
+  private recognition: any = null;
+
+  connectedCallback() {
+    super.connectedCallback();
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      this.recognition = new SpeechRecognition();
+      this.recognition.lang = "fr-FR";
+      this.recognition.interimResults = false;
+
+      this.recognition.onresult = (event: any) => {
+        const text = event.results[0][0].transcript;
+        this.dispatchEvent(new CustomEvent("mic-result", { detail: text }));
+        this.recording = false;
+      };
+      this.recognition.onerror = () => {
+        this.recording = false;
+      };
+    }
+  }
+
+  private toggleRecording() {
+    if (!this.recognition) return;
+    if (!this.recording) {
+      this.recording = true;
+      this.recognition.start();
+    } else {
+      this.recording = false;
+      this.recognition.stop();
+    }
   }
 
   render() {
@@ -59,11 +86,11 @@ export class QueryMicrophone extends LitElement {
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       />
-      <button @click=${this.toggle}>
+      <button @click=${this.toggleRecording}>
         <i
           class=${this.recording
-            ? "fas fa-microphone recording"
-            : "fas fa-microphone"}
+            ? "fa-solid fa-microphone recording"
+            : "fa-solid fa-microphone"}
         ></i>
       </button>
     `;

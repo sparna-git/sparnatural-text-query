@@ -28,17 +28,20 @@ export class QueryInput extends LitElement {
   `;
 
   private onInput(e: Event) {
-    this.value = (e.target as HTMLTextAreaElement).value;
+    const textarea = e.target as HTMLTextAreaElement;
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+    this.value = textarea.value;
     this.dispatchEvent(new CustomEvent("input-change", { detail: this.value }));
   }
 
   render() {
     return html`
       <textarea
-        .value=${this.value}
         rows="1"
-        placeholder=${this.placeholder}
+        .value=${this.value}
         @input=${this.onInput}
+        placeholder="Tape ta requête..."
       ></textarea>
     `;
   }

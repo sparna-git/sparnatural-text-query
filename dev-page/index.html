@@ -72,8 +72,14 @@
         <div class="col-md-7">
           <a href="#" id="switch-language">switch to en</a>
           <div>
-            <query-container lang="en"></query-container>
+            <query-container lang="en">
+              <sparnatural-services
+                slot="services"
+                href="http://localhost:3000/api/v1/dbpedia-en/"
+              ></sparnatural-services>
+            </query-container>
           </div>
+
           <div class="row" style="margin-top: 1em; margin-bottom: 1em">
             <div class="col-md-12 text-center">
               <span style="font-style: italic; font-size: 1.5em" data-i18n="OR"

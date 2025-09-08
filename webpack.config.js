@@ -15,7 +15,7 @@ module.exports = {
     "query-micro": ["./src/sparnatural-text-query/lit/query-micro.ts"],
     "query-send": ["./src/sparnatural-text-query/lit/query-send.ts"],
     "query-dropdown": ["./src/sparnatural-text-query/lit/query-dropdown.ts"],
-    "sparnatural-services": ["./src/services/SparnaturalServicesElement.ts"],
+    "service-container": ["./src/services/Lit/service-container.ts"],
   },
 
   output: {
