@@ -10,6 +10,9 @@ export class QueryContainer extends LitElement {
   @property({ type: String }) lang = "en";
   @state() private value = "";
   @state() private serviceHref = "";
+
+  private _serviceAttrObserver: MutationObserver | null = null;
+
   static styles = css`
     :host {
       display: block;
@@ -20,7 +23,6 @@ export class QueryContainer extends LitElement {
       padding: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
     }
-
     .container {
       display: flex;
       align-items: center;
@@ -31,50 +33,77 @@ export class QueryContainer extends LitElement {
       background: white;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
-
-    .message-container {
-      display: block;
-      margin-top: 10px;
-    }
-
-    .warning-message,
-    .error-message {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-radius: 6px;
-      padding: 10px 14px;
-      font-size: 14px;
-      line-height: 1.5;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      width: fit-content;
-    }
-
-    .warning-message {
-      background-color: #fff3cd;
-      border: 1px solid #ffeaa7;
-      color: #856404;
-    }
-
-    .error-message {
-      background-color: #f8d7da;
-      border: 1px solid #f5c6cb;
-      color: #721c24;
-    }
     .controls {
       display: flex;
       align-items: center;
       gap: 6px;
       margin-left: auto; /* pousse tout le bloc à droite */
     }
+    .message-container {
+      display: block;
+      margin-top: 10px;
+    }
+    .warning-message {
+      background: #fff3cd;
+      padding: 10px;
+      border-radius: 6px;
+      color: #856404;
+    }
+    .error-message {
+      background: #f8d7da;
+      padding: 10px;
+      border-radius: 6px;
+      color: #721c24;
+    }
   `;
 
   firstUpdated() {
-    // récupère le sparnatural-services enfant
-    const service = this.querySelector("sparnatural-services") as any;
-    if (service && service.href) {
-      this.serviceHref = service.href;
-      console.log("QueryContainer detected service href:", this.serviceHref);
+    // sync now and when slot changes
+    const slot = this.renderRoot.querySelector(
+      'slot[name="services"]'
+    ) as HTMLSlotElement | null;
+    this.syncServiceHref();
+    slot?.addEventListener("slotchange", () => this.syncServiceHref());
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    if (this._serviceAttrObserver) {
+      this._serviceAttrObserver.disconnect();
+      this._serviceAttrObserver = null;
+    }
+  }
+
+  private syncServiceHref() {
+    // The <sparnatural-services> is a light DOM child assigned to the slot,
+    // so querySelector on this (light DOM) finds it.
+    const serviceEl = this.querySelector(
+      "sparnatural-services"
+    ) as HTMLElement | null;
+    const href = serviceEl?.getAttribute("href") || "";
+    if (href !== this.serviceHref) {
+      this.serviceHref = href;
+    }
+
+    // Observe attribute changes on the service element (so dynamic changes update the button)
+    if (this._serviceAttrObserver) {
+      this._serviceAttrObserver.disconnect();
+      this._serviceAttrObserver = null;
+    }
+    if (serviceEl) {
+      this._serviceAttrObserver = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (m.type === "attributes" && (m as any).attributeName === "href") {
+            const newHref =
+              (m.target as HTMLElement).getAttribute("href") || "";
+            if (newHref !== this.serviceHref) this.serviceHref = newHref;
+          }
+        }
+      });
+      this._serviceAttrObserver.observe(serviceEl, {
+        attributes: true,
+        attributeFilter: ["href"],
+      });
     }
   }
 
@@ -87,11 +116,48 @@ export class QueryContainer extends LitElement {
   }
 
   private onMicToggle(e: CustomEvent) {
-    console.log("Mic toggled:", e.detail);
+    this.value = e.detail; // if mic returns text via event
   }
 
-  private onSend() {
-    console.log("Send query:", this.value);
+  // events from query-send
+  private onLoadQueryFromSend(e: CustomEvent) {
+    // bubble the event as 'loadQuery' (camelCase) for compatibility with old code
+    const detail = e.detail;
+    this.dispatchEvent(
+      new CustomEvent("loadQuery", { detail, bubbles: true, composed: true })
+    );
+    // also clear messages
+    this.hideMessage();
+  }
+
+  private onQueryWarning(e: CustomEvent) {
+    this.showWarningMessage(String(e.detail));
+  }
+
+  private onQueryError(e: CustomEvent) {
+    this.showErrorMessage(String(e.detail));
+  }
+
+  // simple message UI
+  private showWarningMessage(msg: string) {
+    const container = this.renderRoot.querySelector(
+      ".message-container"
+    ) as HTMLElement;
+    if (container)
+      container.innerHTML = `<div class="warning-message">${msg}</div>`;
+  }
+  private showErrorMessage(msg: string) {
+    const container = this.renderRoot.querySelector(
+      ".message-container"
+    ) as HTMLElement;
+    if (container)
+      container.innerHTML = `<div class="error-message">${msg}</div>`;
+  }
+  private hideMessage() {
+    const container = this.renderRoot.querySelector(
+      ".message-container"
+    ) as HTMLElement;
+    if (container) container.innerHTML = "";
   }
 
   render() {
@@ -113,13 +179,24 @@ export class QueryContainer extends LitElement {
             ]}
             @option-selected=${this.onOptionSelected}
           ></query-dropdown>
-          <query-microphone @mic-toggle=${this.onMicToggle}></query-microphone>
-          <query-send @send-query=${this.onSend}></query-send>
+
+          <query-microphone @voice-input=${this.onMicToggle}></query-microphone>
+
+          <!-- slot where user places <sparnatural-services slot="services" href="..."> -->
+          <slot name="services"></slot>
+
+          <!-- pass value and the service href to the button; listen events from it -->
+          <query-send
+            .value=${this.value}
+            .href=${this.serviceHref}
+            @load-query=${(e: CustomEvent) => this.onLoadQueryFromSend(e)}
+            @query-warning=${(e: CustomEvent) => this.onQueryWarning(e)}
+            @query-error=${(e: CustomEvent) => this.onQueryError(e)}
+          ></query-send>
         </div>
       </div>
 
-      <!-- slot pour sparnatural-services si besoin -->
-      <slot name="services"></slot>
+      <div class="message-container"></div>
     `;
   }
 }

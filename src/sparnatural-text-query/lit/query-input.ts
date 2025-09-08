@@ -16,7 +16,6 @@ export class QueryInput extends LitElement {
       resize: none;
       overflow: hidden;
       background: transparent;
-      min-height: 24px;
       line-height: 1.5;
       padding: 0;
       margin: 0;
@@ -39,7 +38,6 @@ export class QueryInput extends LitElement {
     return html`
       <textarea
         rows="1"
-        .value=${this.value}
         @input=${this.onInput}
         placeholder="Tape ta requête..."
       ></textarea>
