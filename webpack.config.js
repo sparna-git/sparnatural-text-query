@@ -17,6 +17,7 @@ module.exports = {
     "query-dropdown": ["./src/sparnatural-text-query/lit/query-dropdown.ts"],
     "sparnatural-services": ["./src/services/SparnaturalServicesElement.ts"],
   },
+
   output: {
     path: path.resolve(__dirname, "./dist/browser"),
     filename: "[name].js",

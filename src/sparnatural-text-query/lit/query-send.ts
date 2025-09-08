@@ -23,15 +23,18 @@ export class QuerySend extends LitElement {
       background-color: rgba(2, 184, 117, 0.8);
     }
   `;
-
   private send() {
     this.dispatchEvent(new CustomEvent("send-query"));
   }
 
   render() {
     return html`
-      <button @click=${this.send}>
-        <i class="fa-solid fa-arrow-up"></i>
+      <button @click=${this.send} id="send-button">
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <i class="fa-solid fa-arrow-up" style="color: white;"></i>
       </button>
     `;
   }

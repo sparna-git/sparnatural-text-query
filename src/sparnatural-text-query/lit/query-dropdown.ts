@@ -75,6 +75,10 @@ export class QueryDropdown extends LitElement {
 
   render() {
     return html`
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      />
       <div class="dropdown">
         <button @click=${this.toggle}><i class="fas fa-list"></i></button>
         ${this.open

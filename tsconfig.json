@@ -8,8 +8,8 @@
     "allowJs": true,
     "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true, // 🔥 ajoute ça
-    "useDefineForClassFields": false // 🔥 ajoute ça aussi
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
   },
   "include": ["src/**/*.ts"]
 }
