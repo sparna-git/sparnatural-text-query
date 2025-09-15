@@ -81,7 +81,7 @@ export class QuerySend extends LitElement {
     if (!this.value || !this.value.trim()) {
       this.dispatchEvent(
         new CustomEvent("query-error", {
-          detail: "Prompt vide",
+          detail: "The input field is empty. Please enter a query.",
           bubbles: true,
           composed: true,
         })
@@ -108,7 +108,7 @@ export class QuerySend extends LitElement {
 
       // 204 special case
       if (res.status === 204) {
-        let explanation = "Empty response from service";
+        let explanation = "The query was not understood";
         try {
           const json = await res.json();
           if (json?.metadata?.explanation)
