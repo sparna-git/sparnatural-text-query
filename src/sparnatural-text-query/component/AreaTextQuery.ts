@@ -148,15 +148,6 @@ class AreaTextQuery extends HTMLComponent {
       return;
     }
 
-    // Vérifie la longueur maximale
-    const MAX_LENGTH = 500;
-    if (prompt.length > MAX_LENGTH) {
-      this.showErrorMessage(
-        `Votre requête ne doit pas dépasser ${MAX_LENGTH} caractères. (${prompt.length} actuellement)`
-      );
-      return;
-    }
-
     const originalText = sendButton.innerHTML;
     sendButton.disabled = true;
     sendButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
