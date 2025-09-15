@@ -23,7 +23,6 @@ export class SparnaturalServices extends LitElement {
     :host {
       display: block;
     }
-    /* tu peux ajouter ici du CSS spécifique pour ton service */
   `;
 
   constructor() {

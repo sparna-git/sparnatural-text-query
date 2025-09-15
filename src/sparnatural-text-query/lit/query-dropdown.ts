@@ -69,7 +69,13 @@ export class QueryDropdown extends LitElement {
   }
 
   private selectOption(opt: string) {
-    this.dispatchEvent(new CustomEvent("option-selected", { detail: opt }));
+    this.dispatchEvent(
+      new CustomEvent("option-selected", {
+        detail: opt,
+        bubbles: true,
+        composed: true,
+      })
+    );
     this.open = false;
   }
 

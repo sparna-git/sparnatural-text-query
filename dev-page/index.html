@@ -77,6 +77,21 @@
                 slot="services"
                 href="http://localhost:3000/api/v1/dbpedia-en/"
               ></sparnatural-services>
+
+              <query-input
+                slot="input"
+                placeholder="Ex : Donne-moi toutes les ouvres de Van Gogh"
+              ></query-input>
+
+              <query-dropdown
+                slot="dropdown"
+                options='[
+        "Find all museums in France",
+        "What artists were born in Algeria?",
+        "List all movements where the participating artists are from Italy",
+        "Baroque artworks"
+      ]'
+              ></query-dropdown>
             </query-container>
           </div>
 

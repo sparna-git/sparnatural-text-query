@@ -37,7 +37,7 @@ export class QueryContainer extends LitElement {
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-left: auto; /* pousse tout le bloc à droite */
+      margin-left: auto;
     }
     .message-container {
       display: block;
@@ -111,10 +111,6 @@ export class QueryContainer extends LitElement {
     this.value = e.detail;
   }
 
-  private onOptionSelected(e: CustomEvent) {
-    this.value = e.detail;
-  }
-
   private onMicToggle(e: CustomEvent) {
     this.value = e.detail; // if mic returns text via event
   }
@@ -159,33 +155,21 @@ export class QueryContainer extends LitElement {
     ) as HTMLElement;
     if (container) container.innerHTML = "";
   }
-
   render() {
     return html`
       <div class="container">
-        <query-input
-          .value=${this.value}
-          placeholder=${this.lang === "fr"
-            ? "Ex : Donne-moi toutes les œuvres exposées en France"
-            : "Ex: Give me all the artworks exhibited in France"}
-          @input-change=${this.onInputChange}
-        ></query-input>
-
+        <!-- on écoute input-change émis par le query-input slotté -->
+        <slot
+          name="input"
+          @input-change=${(e: CustomEvent) => this.onInputChange(e)}
+        ></slot>
         <div class="controls">
-          <query-dropdown
-            .options=${[
-              this.lang === "fr" ? "Exemple A" : "Example A",
-              this.lang === "fr" ? "Exemple B" : "Example B",
-            ]}
-            @option-selected=${this.onOptionSelected}
-          ></query-dropdown>
-
+          <slot
+            name="dropdown"
+            @option-selected=${(e: CustomEvent) => this.onOptionSelected(e)}
+          ></slot>
           <query-microphone @voice-input=${this.onMicToggle}></query-microphone>
-
-          <!-- slot where user places <sparnatural-services slot="services" href="..."> -->
           <slot name="services"></slot>
-
-          <!-- pass value and the service href to the button; listen events from it -->
           <query-send
             .value=${this.value}
             .href=${this.serviceHref}
@@ -198,5 +182,18 @@ export class QueryContainer extends LitElement {
 
       <div class="message-container"></div>
     `;
+  }
+
+  private onOptionSelected(e: CustomEvent) {
+    this.value = e.detail;
+
+    // chercher le query-input slotté
+    const inputEl =
+      (this.querySelector('query-input[slot="input"]') as any) ||
+      (this.querySelector("query-input") as any);
+    if (inputEl) {
+      // setter sur la propriété déclenchera la mise à jour dans query-input
+      inputEl.value = this.value;
+    }
   }
 }
