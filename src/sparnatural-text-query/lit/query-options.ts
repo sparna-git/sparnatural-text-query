@@ -1,8 +1,8 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
-@customElement("query-dropdown")
-export class QueryDropdown extends LitElement {
+@customElement("query-options")
+export class QueryOptions extends LitElement {
   @property({ type: Array }) options: string[] = [];
   @state() private open = false;
 

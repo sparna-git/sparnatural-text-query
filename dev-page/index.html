@@ -72,26 +72,27 @@
         <div class="col-md-7">
           <a href="#" id="switch-language">switch to en</a>
           <div>
-            <query-container lang="en">
+            <query-container lang="fr">
               <sparnatural-services
                 slot="services"
                 href="http://localhost:3000/api/v1/dbpedia-en/"
               ></sparnatural-services>
 
-              <query-input
+              <!-- textarea natif -->
+              <textarea
                 slot="input"
-                placeholder="Ex : Donne-moi toutes les ouvres de Van Gogh"
-              ></query-input>
-
-              <query-dropdown
+                id="input-slot"
+                placeholder="Ex : Donne-moi toutes les œuvres exposées en France"
+              ></textarea>
+              <query-options
                 slot="dropdown"
                 options='[
-        "Find all museums in France",
-        "What artists were born in Algeria?",
-        "List all movements where the participating artists are from Italy",
-        "Baroque artworks"
-      ]'
-              ></query-dropdown>
+                            "Find all museums in France",
+                            "What artists were born in Algeria?",
+                            "List all movements where the participating artists are from Italy",
+                            "Baroque artworks"
+                          ]'
+              ></query-options>
             </query-container>
           </div>
 

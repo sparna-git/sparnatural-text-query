@@ -1,14 +1,8 @@
 {
-  "send": "Envoyer",
-  "Exemple": "Ex : Donne-moi toutes les œuvres exposées en France",
-  "warning-1": "⚠️ Attention, les valeurs suivantes n'ont pas été trouvées : ",
-  "warning-2": ". Vous devriez revoir votre requête et rechercher ou sélectionner manuellement les valeurs correctes.",
-  "select-example": "Sélectionnez une requête d'exemple...",
-  "example-1": "Trouver tous les musées en France",
-  "example-2": "Quels artistes sont nés en Algérie?",
-  "example-3": "Lister tous les mouvements dont les artistes participants sont originaires d'Italie",
-  "example-4": "Œuvres baroques",
   "error-empty-prompt": "Le champ de saisie est vide. Veuillez entrer une requête.",
   "error-not-understood": "La requête n'a pas été comprise",
-  "ia-response": "⚠️ Réponse de l'agent IA: "
+  "warning-1": "⚠️ Attention, les valeurs suivantes n'ont pas été trouvées : {valuesList}",
+  "warning-2": ". Vous devriez revoir votre requête et rechercher ou sélectionner manuellement les valeurs correctes.",
+  "ia-response": "⚠️ Réponse de l'agent IA: {explanation}",
+  "error-service-url": "L'URL du service n'est pas définie."
 }

@@ -1,22 +1,23 @@
 import { LitElement, html, css } from "lit";
 import { customElement, state, property } from "lit/decorators.js";
-import "./query-input";
-import "./query-dropdown";
+import { pickI18n, I18n } from "../settings/i18n";
+import "./query-options";
 import "./query-micro";
 import "./query-send";
 
 @customElement("query-container")
 export class QueryContainer extends LitElement {
-  @property({ type: String }) lang = "en";
+  @property({ type: String, reflect: true }) lang: "en" | "fr" = "en";
   @state() private value = "";
   @state() private serviceHref = "";
+  @state() private i18n: I18n = pickI18n("en");
 
   private _serviceAttrObserver: MutationObserver | null = null;
 
   static styles = css`
     :host {
       display: block;
-      max-width: 900px;
+      max-width: 700px;
       margin: 0 auto auto;
       font-family: sans-serif;
       background: rgba(29, 224, 153, 0.1);
@@ -33,6 +34,23 @@ export class QueryContainer extends LitElement {
       background: white;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
+
+    /* Styles appliqués au <textarea> slotté */
+    :host ::slotted(textarea) {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      font-family: inherit;
+      overflow: hidden;
+      background: transparent;
+      line-height: 1.5;
+      padding: 0;
+      margin: 0;
+      min-width: 500px;
+      resize: none !important;
+    }
+
     .controls {
       display: flex;
       align-items: center;
@@ -58,12 +76,30 @@ export class QueryContainer extends LitElement {
   `;
 
   firstUpdated() {
-    // sync now and when slot changes
-    const slot = this.renderRoot.querySelector(
-      'slot[name="services"]'
-    ) as HTMLSlotElement | null;
-    this.syncServiceHref();
-    slot?.addEventListener("slotchange", () => this.syncServiceHref());
+    // brancher listeners warning/error
+    this.addEventListener("query-warning", (e: any) => {
+      const msg = String(e.detail).trim();
+      if (msg) this.showWarningMessage(msg);
+    });
+    this.addEventListener("query-error", (e: any) => {
+      const msg = String(e.detail).trim();
+      if (msg) this.showErrorMessage(msg);
+    });
+
+    // brancher le slot input + appliquer styles inline critiques (resize)
+    const slot = this.shadowRoot!.querySelector(
+      'slot[name="input"]'
+    ) as HTMLSlotElement;
+    if (slot) {
+      slot.addEventListener("slotchange", () => this._wireTextarea());
+      this._wireTextarea(); // premier passage
+    }
+  }
+
+  updated(changed: Map<string, unknown>) {
+    if (changed.has("lang")) {
+      this.i18n = pickI18n(this.lang);
+    }
   }
 
   disconnectedCallback() {
@@ -74,18 +110,51 @@ export class QueryContainer extends LitElement {
     }
   }
 
+  private getTextarea(): HTMLTextAreaElement | null {
+    const slot = this.shadowRoot!.querySelector(
+      'slot[name="input"]'
+    ) as HTMLSlotElement;
+    if (!slot) return null;
+    const assigned = slot.assignedElements({ flatten: true }) as Element[];
+    const el = assigned.find((e) => e.tagName.toLowerCase() === "textarea") as
+      | HTMLTextAreaElement
+      | undefined;
+    return el || null;
+  }
+
+  private _wireTextarea() {
+    const ta = this.getTextarea();
+    if (!ta) return;
+
+    // éviter doublons
+    if (!(ta as any)._qcWired) {
+      ta.addEventListener("input", (e) => this.onInputChange(e as Event));
+      (ta as any)._qcWired = true;
+    }
+
+    // 🔒 Forcer "resize: none" en inline (bat bootstrap et co)
+    ta.style.setProperty("resize", "none", "important");
+    //
+    ta.style.setProperty("border", "none", "important"); // cohérence visuelle
+    // cohérence visuelle
+    ta.style.overflow = "hidden";
+
+    // autosize initial si valeur présente
+    this.autoSize(ta);
+  }
+
+  private autoSize(textarea: HTMLTextAreaElement) {
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+  }
+
   private syncServiceHref() {
-    // The <sparnatural-services> is a light DOM child assigned to the slot,
-    // so querySelector on this (light DOM) finds it.
     const serviceEl = this.querySelector(
       "sparnatural-services"
     ) as HTMLElement | null;
     const href = serviceEl?.getAttribute("href") || "";
-    if (href !== this.serviceHref) {
-      this.serviceHref = href;
-    }
+    if (href !== this.serviceHref) this.serviceHref = href;
 
-    // Observe attribute changes on the service element (so dynamic changes update the button)
     if (this._serviceAttrObserver) {
       this._serviceAttrObserver.disconnect();
       this._serviceAttrObserver = null;
@@ -107,34 +176,43 @@ export class QueryContainer extends LitElement {
     }
   }
 
-  private onInputChange(e: CustomEvent) {
-    this.value = e.detail;
-  }
-
-  private onMicToggle(e: CustomEvent) {
-    this.value = e.detail; // if mic returns text via event
-  }
-
-  // events from query-send
-  private onLoadQueryFromSend(e: CustomEvent) {
-    // bubble the event as 'loadQuery' (camelCase) for compatibility with old code
-    const detail = e.detail;
-    this.dispatchEvent(
-      new CustomEvent("loadQuery", { detail, bubbles: true, composed: true })
-    );
-    // also clear messages
+  private onInputChange(e: Event) {
+    const textarea = e.target as HTMLTextAreaElement;
+    this.autoSize(textarea);
+    this.value = textarea.value;
     this.hideMessage();
   }
 
-  private onQueryWarning(e: CustomEvent) {
-    this.showWarningMessage(String(e.detail));
+  private onOptionSelected(e: CustomEvent) {
+    this.value = e.detail;
+    const ta = this.getTextarea();
+    if (ta) {
+      ta.value = this.value;
+      this.autoSize(ta);
+    }
+    this.hideMessage();
   }
 
-  private onQueryError(e: CustomEvent) {
-    this.showErrorMessage(String(e.detail));
+  private onMicToggle = (e: CustomEvent) => {
+    this.value = e.detail;
+    const ta = this.getTextarea();
+    if (ta) {
+      ta.value = this.value;
+      this.autoSize(ta);
+    }
+    this.hideMessage();
+  };
+
+  private onLoadQueryFromSend(e: CustomEvent) {
+    this.dispatchEvent(
+      new CustomEvent("loadQuery", {
+        detail: e.detail,
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
-  // simple message UI
   private showWarningMessage(msg: string) {
     const container = this.renderRoot.querySelector(
       ".message-container"
@@ -155,45 +233,42 @@ export class QueryContainer extends LitElement {
     ) as HTMLElement;
     if (container) container.innerHTML = "";
   }
+
   render() {
     return html`
       <div class="container">
-        <!-- on écoute input-change émis par le query-input slotté -->
-        <slot
-          name="input"
-          @input-change=${(e: CustomEvent) => this.onInputChange(e)}
-        ></slot>
+        <!-- textarea natif slotté -->
+        <slot name="input" id="input-slot"></slot>
+
         <div class="controls">
+          <slot
+            name="services"
+            @slotchange=${() => this.syncServiceHref()}
+          ></slot>
           <slot
             name="dropdown"
             @option-selected=${(e: CustomEvent) => this.onOptionSelected(e)}
           ></slot>
-          <query-microphone @voice-input=${this.onMicToggle}></query-microphone>
-          <slot name="services"></slot>
+
+          <query-microphone
+            .lang=${this.lang}
+            @mic-result=${this.onMicToggle}
+          ></query-microphone>
+
           <query-send
             .value=${this.value}
             .href=${this.serviceHref}
-            @load-query=${(e: CustomEvent) => this.onLoadQueryFromSend(e)}
-            @query-warning=${(e: CustomEvent) => this.onQueryWarning(e)}
-            @query-error=${(e: CustomEvent) => this.onQueryError(e)}
+            .i18n=${this.i18n}
+            @load-query=${this.onLoadQueryFromSend}
+            @query-warning=${(e: CustomEvent) =>
+              this.showWarningMessage(String(e.detail))}
+            @query-error=${(e: CustomEvent) =>
+              this.showErrorMessage(String(e.detail))}
           ></query-send>
         </div>
       </div>
 
       <div class="message-container"></div>
     `;
-  }
-
-  private onOptionSelected(e: CustomEvent) {
-    this.value = e.detail;
-
-    // chercher le query-input slotté
-    const inputEl =
-      (this.querySelector('query-input[slot="input"]') as any) ||
-      (this.querySelector("query-input") as any);
-    if (inputEl) {
-      // setter sur la propriété déclenchera la mise à jour dans query-input
-      inputEl.value = this.value;
-    }
   }
 }

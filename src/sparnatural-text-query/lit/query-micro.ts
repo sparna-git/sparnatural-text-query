@@ -1,9 +1,12 @@
 import { LitElement, html, css } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, state, property } from "lit/decorators.js";
 
 @customElement("query-microphone")
 export class QueryMicrophone extends LitElement {
+  @property({ type: String }) lang: "fr" | "en" = "fr";
+
   @state() private recording = false;
+  private recognition: any = null;
 
   static styles = css`
     button {
@@ -46,16 +49,15 @@ export class QueryMicrophone extends LitElement {
     }
   `;
 
-  private recognition: any = null;
-
   connectedCallback() {
     super.connectedCallback();
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
+
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
-      this.recognition.lang = "fr-FR";
+      this.setRecognitionLang(); // Set initial language
       this.recognition.interimResults = false;
 
       this.recognition.onresult = (event: any) => {
@@ -63,10 +65,22 @@ export class QueryMicrophone extends LitElement {
         this.dispatchEvent(new CustomEvent("mic-result", { detail: text }));
         this.recording = false;
       };
+
       this.recognition.onerror = () => {
         this.recording = false;
       };
     }
+  }
+
+  updated(changed: Map<string, unknown>) {
+    if (changed.has("lang") && this.recognition) {
+      this.setRecognitionLang();
+    }
+  }
+
+  private setRecognitionLang() {
+    this.recognition.lang = this.lang === "fr" ? "fr-FR" : "en-US";
+    console.log("Micro lang set to:", this.recognition.lang);
   }
 
   private toggleRecording() {

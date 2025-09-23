@@ -11,10 +11,11 @@ const BundleAnalyzerPlugin =
 module.exports = {
   entry: {
     "query-container": ["./src/sparnatural-text-query/lit/query-container.ts"],
-    "query-input": ["./src/sparnatural-text-query/lit/query-input.ts"],
     "query-micro": ["./src/sparnatural-text-query/lit/query-micro.ts"],
     "query-send": ["./src/sparnatural-text-query/lit/query-send.ts"],
-    "query-dropdown": ["./src/sparnatural-text-query/lit/query-dropdown.ts"],
+    "query-options": ["./src/sparnatural-text-query/lit/query-options.ts"],
+    "sparnatural-services": ["./src/services/Lit/service-container.ts"],
+    i18n: ["./src/sparnatural-text-query/settings/i18n.ts"],
   },
 
   output: {

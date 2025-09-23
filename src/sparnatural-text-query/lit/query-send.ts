@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { I18n, fmt } from "../settings/i18n";
 
 @customElement("query-send")
 export class QuerySend extends LitElement {
@@ -9,6 +10,8 @@ export class QuerySend extends LitElement {
   @property({ type: String }) value = "";
   // href comes from container (sparnatural-services)
   @property({ type: String }) href = "";
+
+  @property({ type: Object }) i18n!: I18n; // provided by container
 
   static styles = css`
     button {
@@ -81,7 +84,7 @@ export class QuerySend extends LitElement {
     if (!this.value || !this.value.trim()) {
       this.dispatchEvent(
         new CustomEvent("query-error", {
-          detail: "The input field is empty. Please enter a query.",
+          detail: this.i18n["error-empty-prompt"],
           bubbles: true,
           composed: true,
         })
@@ -91,7 +94,7 @@ export class QuerySend extends LitElement {
     if (!this.href) {
       this.dispatchEvent(
         new CustomEvent("query-error", {
-          detail: "Service href manquant",
+          detail: this.i18n["error-service-url"],
           bubbles: true,
           composed: true,
         })
@@ -108,7 +111,7 @@ export class QuerySend extends LitElement {
 
       // 204 special case
       if (res.status === 204) {
-        let explanation = "The query was not understood";
+        let explanation = this.i18n["error-not-understood"];
         try {
           const json = await res.json();
           if (json?.metadata?.explanation)
@@ -133,18 +136,22 @@ export class QuerySend extends LitElement {
           .join(", ");
         this.dispatchEvent(
           new CustomEvent("query-warning", {
-            detail: `Entities not found: ${valuesList}`,
+            detail:
+              fmt(this.i18n["warning-1"], { valuesList }) +
+              this.i18n["warning-2"],
             bubbles: true,
             composed: true,
           })
         );
+        console.log("Not found values:", valuesList);
       }
 
-      // metadata.explanation
-      if (json.metadata && typeof json.metadata.explanation === "string") {
+      const explanation = json?.metadata?.explanation;
+
+      if (typeof explanation === "string" && explanation.trim().length > 0) {
         this.dispatchEvent(
           new CustomEvent("query-warning", {
-            detail: `IA: ${json.metadata.explanation}`,
+            detail: fmt(this.i18n["ia-response"], { explanation }),
             bubbles: true,
             composed: true,
           })
