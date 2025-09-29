@@ -36,8 +36,8 @@ class AreaTextQuery extends HTMLComponent {
     textarea.placeholder =
       "Ex : Donne-moi toutes les œuvres exposées en France";
 
-    // Auto-expand jusqu'à 200px puis scroll interne
-    const MAX_HEIGHT = 200;
+    // Auto-expand jusqu'à 150px puis scroll interne
+    const MAX_HEIGHT = 150;
     textarea.addEventListener("input", () => {
       textarea.classList.remove("is-scrollable");
       textarea.style.height = "auto";
