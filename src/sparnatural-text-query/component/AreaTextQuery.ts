@@ -36,10 +36,21 @@ class AreaTextQuery extends HTMLComponent {
     textarea.placeholder =
       "Ex : Donne-moi toutes les œuvres exposées en France";
 
-    // Auto-expand functionality
+    // Auto-expand jusqu'à 200px puis scroll interne
+    const MAX_HEIGHT = 200;
     textarea.addEventListener("input", () => {
+      textarea.classList.remove("is-scrollable");
       textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight + "px";
+      const needed = textarea.scrollHeight;
+
+      if (needed <= MAX_HEIGHT) {
+        textarea.style.height = needed + "px";
+        textarea.style.overflowY = "hidden";
+      } else {
+        textarea.style.height = MAX_HEIGHT + "px";
+        textarea.style.overflowY = "auto";
+        textarea.classList.add("is-scrollable");
+      }
     });
 
     // Submit on Enter, newline on Ctrl+Enter (ou Cmd+Enter). On empêche toujours le comportement par défaut

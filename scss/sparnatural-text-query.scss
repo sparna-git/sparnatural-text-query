@@ -36,12 +36,16 @@ sparnatural-text-query {
       overflow: hidden;
       background: transparent;
       min-height: 24px;
+      max-height: 200px;
       line-height: 1.5;
       padding: 0;
       margin: 0;
 
       &::placeholder {
         color: #999;
+      }
+      &.is-scrollable {
+        overflow-y: auto;
       }
     }
   }
