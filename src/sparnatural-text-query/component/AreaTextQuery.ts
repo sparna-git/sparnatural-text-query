@@ -42,6 +42,30 @@ class AreaTextQuery extends HTMLComponent {
       textarea.style.height = textarea.scrollHeight + "px";
     });
 
+    // Submit on Enter, newline on Ctrl+Enter (ou Cmd+Enter). On empêche toujours le comportement par défaut
+    textarea.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        if (e.shiftKey) {
+          // Insertion manuelle d'une nouvelle ligne
+          e.preventDefault();
+          const start = textarea.selectionStart;
+          const end = textarea.selectionEnd;
+          const before = textarea.value.substring(0, start);
+          const after = textarea.value.substring(end);
+          textarea.value = before + "\n" + after;
+          const newPos = start + 1;
+          textarea.selectionStart = textarea.selectionEnd = newPos;
+
+          // Déclenche un event input pour rester cohérent
+          textarea.dispatchEvent(new Event("input"));
+        } else {
+          // Envoi
+          e.preventDefault();
+          this.sendNaturalRequest();
+        }
+      }
+    });
+
     inputContainer.appendChild(textarea);
 
     // ✅ Créer le conteneur des boutons à droite de l'input
