@@ -7,6 +7,7 @@ import { SparnaturalTextQueryI18n } from "../settings/SparnaturalTextQueryI18n";
 class AreaTextQuery extends HTMLComponent {
   specProvider: ISparnaturalSpecification;
   lang: string;
+  private isSubmitting: boolean = false; // Flag to prevent multiple submissions
 
   constructor(ParentComponent: HTMLComponent) {
     super("AreaTextQuery", ParentComponent, null);
@@ -53,11 +54,11 @@ class AreaTextQuery extends HTMLComponent {
       }
     });
 
-    // Submit on Enter, newline on Ctrl+Enter (ou Cmd+Enter). On empêche toujours le comportement par défaut
+    // Submit on Enter, newline on Shift+Enter
     textarea.addEventListener("keydown", (e: KeyboardEvent) => {
       if (e.key === "Enter") {
         if (e.shiftKey) {
-          // Insertion manuelle d'une nouvelle ligne
+          // Insert newline manually (prevent submit)
           e.preventDefault();
           const start = textarea.selectionStart;
           const end = textarea.selectionEnd;
@@ -66,13 +67,13 @@ class AreaTextQuery extends HTMLComponent {
           textarea.value = before + "\n" + after;
           const newPos = start + 1;
           textarea.selectionStart = textarea.selectionEnd = newPos;
-
-          // Déclenche un event input pour rester cohérent
           textarea.dispatchEvent(new Event("input"));
         } else {
-          // Envoi
+          // Submit only if not already submitting
           e.preventDefault();
-          this.sendNaturalRequest();
+          if (!this.isSubmitting) {
+            this.sendNaturalRequest();
+          }
         }
       }
     });
@@ -171,6 +172,11 @@ class AreaTextQuery extends HTMLComponent {
     return this;
   }
   private async sendNaturalRequest(): Promise<void> {
+    // Prevent multiple submissions
+    if (this.isSubmitting) {
+      return;
+    }
+
     const prompt = (
       document.getElementById("naturalRequest") as HTMLTextAreaElement
     ).value.trim();
@@ -183,6 +189,7 @@ class AreaTextQuery extends HTMLComponent {
       return;
     }
 
+    this.isSubmitting = true; // Set flag
     const originalText = sendButton.innerHTML;
     sendButton.disabled = true;
     sendButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
@@ -267,6 +274,7 @@ class AreaTextQuery extends HTMLComponent {
     } finally {
       sendButton.innerHTML = originalText || "Envoyer";
       sendButton.disabled = false;
+      this.isSubmitting = false; // Reset flag
     }
   }
 
