@@ -1,6 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { I18n, fmt } from "../settings/i18n";
+import { I18n } from "../settings/i18n";
 
 @customElement("query-send")
 export class QuerySend extends LitElement {
@@ -11,7 +11,12 @@ export class QuerySend extends LitElement {
   // href comes from container (sparnatural-services)
   @property({ type: String }) href = "";
 
-  @property({ type: Object }) i18n!: I18n; // provided by container
+  @property({ type: Object }) i18n!: any; // provided by container
+
+  // Fonction fmt locale
+  private fmt(s: string, params: Record<string, string | number> = {}) {
+    return s.replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? `{${k}}`));
+  }
 
   static styles = css`
     button {
@@ -137,7 +142,7 @@ export class QuerySend extends LitElement {
         this.dispatchEvent(
           new CustomEvent("query-warning", {
             detail:
-              fmt(this.i18n["warning-1"], { valuesList }) +
+              this.fmt(this.i18n["warning-1"], { valuesList }) +
               this.i18n["warning-2"],
             bubbles: true,
             composed: true,
@@ -151,7 +156,7 @@ export class QuerySend extends LitElement {
       if (typeof explanation === "string" && explanation.trim().length > 0) {
         this.dispatchEvent(
           new CustomEvent("query-warning", {
-            detail: fmt(this.i18n["ia-response"], { explanation }),
+            detail: this.fmt(this.i18n["ia-response"], { explanation }),
             bubbles: true,
             composed: true,
           })

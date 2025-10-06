@@ -41,6 +41,38 @@
       .yasr_header {
         display: none;
       }
+
+      /* Style pour afficher l'icône au lieu du texte - Version compacte */
+      #query-select {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23495057" d="M40 48C26.7 48 16 58.7 16 72v24c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v24c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V232c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24v24c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V392c0-13.3-10.7-24-24-24H40z"/></svg>') !important;
+        background-repeat: no-repeat !important;
+        background-position: 8px center !important;
+        background-size: 14px 14px !important;
+        text-indent: -9999px !important;
+        color: transparent !important;
+        width: 36px !important;
+        height: 36px !important;
+        padding: 0 !important;
+        font-size: 12px !important;
+      }
+
+      #query-select option {
+        text-indent: 0 !important;
+        color: #495057 !important;
+        padding: 8px !important;
+        font-size: 14px !important;
+      }
+
+      #query-select option:first-child {
+        display: none;
+      }
+
+      /* Quand une option est sélectionnée, garder la taille compacte */
+      #query-select:not([value=""]) {
+        text-indent: -9999px !important;
+        color: transparent !important;
+        width: 36px !important;
+      }
     </style>
 
     <!-- Webpack CSS -->
@@ -72,28 +104,35 @@
         <div class="col-md-7">
           <a href="#" id="switch-language">switch to en</a>
           <div>
-            <query-container lang="fr">
+            <sparnatural-text-query lang="en">
               <sparnatural-services
                 slot="services"
                 href="http://localhost:3000/api/v1/dbpedia-en/"
               ></sparnatural-services>
 
-              <!-- textarea natif -->
+              <!-- textarea -->
               <textarea
                 slot="input"
                 id="input-slot"
                 placeholder="Ex : Donne-moi toutes les œuvres exposées en France"
               ></textarea>
-              <query-options
-                slot="dropdown"
-                options='[
-                            "Find all museums in France",
-                            "What artists were born in Algeria?",
-                            "List all movements where the participating artists are from Italy",
-                            "Baroque artworks"
-                          ]'
-              ></query-options>
-            </query-container>
+              <select slot="dropdown" id="query-select">
+                <option value=""></option>
+                <option value="Find all museums in France">
+                  Find all museums in France
+                </option>
+                <option value="What artists were born in Algeria?">
+                  What artists were born in Algeria?
+                </option>
+                <option
+                  value="List all movements where the participating artists are from Italy"
+                >
+                  List all movements where the participating artists are from
+                  Italy
+                </option>
+                <option value="Baroque artworks">Baroque artworks</option>
+              </select>
+            </sparnatural-text-query>
           </div>
 
           <div class="row" style="margin-top: 1em; margin-bottom: 1em">

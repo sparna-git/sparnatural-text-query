@@ -1,17 +1,18 @@
 // i18n.ts
-import en from "../lang/en.json";
-import fr from "../lang/fr.json";
+import enLabels from "../lang/en.json";
+import frLabels from "../lang/fr.json";
 
-// If you use TS: set "resolveJsonModule": true in tsconfig.json
-// or use: import en from "./lang/en.json" assert { type: "json" };
+export class I18n {
+  static i18nLabelsResources: any = {
+    en: enLabels,
+    fr: frLabels,
+  };
 
-export type Lang = "en" | "fr";
-export type I18n = typeof en;
+  public static labels: any;
 
-const RESOURCES: Record<Lang, I18n> = { en, fr };
+  private constructor() {}
 
-export const pickI18n = (lang: string): I18n =>
-  RESOURCES[lang as Lang] || RESOURCES.en;
-
-export const fmt = (s: string, params: Record<string, string | number> = {}) =>
-  s.replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? `{${k}}`));
+  static init(lang: any) {
+    I18n.labels = I18n.i18nLabelsResources[lang];
+  }
+}

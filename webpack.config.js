@@ -10,18 +10,17 @@ const BundleAnalyzerPlugin =
 
 module.exports = {
   entry: {
-    "query-container": ["./src/sparnatural-text-query/lit/query-container.ts"],
-    "query-micro": ["./src/sparnatural-text-query/lit/query-micro.ts"],
-    "query-send": ["./src/sparnatural-text-query/lit/query-send.ts"],
-    "query-options": ["./src/sparnatural-text-query/lit/query-options.ts"],
-    "sparnatural-services": ["./src/services/Lit/service-container.ts"],
-    i18n: ["./src/sparnatural-text-query/settings/i18n.ts"],
+    "sparnatural-text-query": ["./src/sparnatural-text-query/index.ts"],
   },
 
   output: {
     path: path.resolve(__dirname, "./dist/browser"),
     filename: "[name].js",
     clean: true,
+    // Exposer en tant que module global
+    library: "SparnaturalTextQuery",
+    libraryTarget: "umd",
+    globalObject: "this",
   },
   module: {
     rules: [

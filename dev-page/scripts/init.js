@@ -1,5 +1,5 @@
 const sparnatural = document.querySelector("spar-natural");
-const sparnaturalText2Query = document.querySelector("query-container");
+const sparnaturalText2Query = document.querySelector("sparnatural-text-query");
 
 let lastquery = null;
 
