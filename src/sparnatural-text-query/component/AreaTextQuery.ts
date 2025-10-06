@@ -195,7 +195,14 @@ class AreaTextQuery extends HTMLComponent {
     sendButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
 
     const mistralApiUrl = getSettingsServices().href;
-    const url = `${mistralApiUrl}text2query?text=${encodeURIComponent(prompt)}`;
+    //si le mistralApiUrl ne se termine pas par un slash, on l'ajoute
+    const normalizedMistralApiUrl = mistralApiUrl.endsWith("/")
+      ? mistralApiUrl
+      : mistralApiUrl + "/";
+    console.log("Mistral API URL:", normalizedMistralApiUrl);
+    const url = `${normalizedMistralApiUrl}text2query?text=${encodeURIComponent(
+      prompt
+    )}`;
     console.log("URL de la requête :", url);
 
     try {
